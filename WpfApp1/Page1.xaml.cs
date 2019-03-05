@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Media.Animation;
+using System.Windows.Threading;
 
 namespace WpfApp1
 {
@@ -22,15 +23,64 @@ namespace WpfApp1
     public partial class Page1 : Page
     {
         Random random = new Random();
+        DispatcherTimer enemyTimer = new DispatcherTimer();
+        DispatcherTimer targetTimer = new DispatcherTimer();
+        bool humanCaptured = false;
+
 
         public Page1()
         {
             InitializeComponent();
+            enemyTimer.Tick += EnemyTimer_Tick;
+            enemyTimer.Interval = TimeSpan.FromSeconds(2);
+
+            targetTimer.Tick += TargetTimer_Tick;
+            targetTimer.Interval = TimeSpan.FromSeconds(1);
+        }
+
+        private void TargetTimer_Tick(object sender, EventArgs e)
+        {
+            progressBar.Value += 1;
+            if(progressBar.Value >= progressBar.Maximum)
+            {
+                EndTheGame();
+            }
+        }
+
+        private void EnemyTimer_Tick(object sender, EventArgs e)
+        {
+            AddEnemy();
+        }
+
+        private void EndTheGame()
+        {
+            if(!playArea.Children.Contains(gameOverText))
+            {
+                enemyTimer.Stop();
+                targetTimer.Stop();
+                humanCaptured = false;
+                startButton.Visibility = Visibility.Visible;
+                playArea.Children.Add(gameOverText);
+            }
         }
 
         private void StartButton_Click(object sender, RoutedEventArgs e)
         {
-            AddEnemy();
+            //AddEnemy();
+            StartGame();
+        }
+
+        private void StartGame()
+        {
+            human.IsHitTestVisible = true;
+            humanCaptured = false;
+            progressBar.Value = 0;
+            startButton.Visibility = Visibility.Collapsed;
+            playArea.Children.Clear();
+            playArea.Children.Add(target);
+            playArea.Children.Add(human);
+            enemyTimer.Start();
+            targetTimer.Start();
         }
 
         private void AddEnemy()
@@ -43,6 +93,16 @@ namespace WpfApp1
             int randomTo = (int)playArea.ActualHeight - 100;
             AnimateEnemy(enemy, random.Next(randomFrom), random.Next(randomTo), "(Canvas.Top)");
             playArea.Children.Add(enemy);
+
+            enemy.TouchEnter += Enemy_TouchEnter;
+        }
+
+        private void Enemy_TouchEnter(object sender, TouchEventArgs e)
+        {
+            if(humanCaptured)
+            {
+                EndTheGame();
+            }
         }
 
         private void AnimateEnemy(ContentControl enemy, double from, double to, string propertyToAnimate)
@@ -64,6 +124,57 @@ namespace WpfApp1
             storyboard.Children.Add(animation);
             storyboard.Begin();
 
+        }
+
+        private void Human_TouchDown(object sender, TouchEventArgs e)
+        {
+            if(enemyTimer.IsEnabled)
+            {
+                humanCaptured = true;
+                human.IsHitTestVisible = false;
+            }
+        }
+
+        private void Target_TouchEnter(object sender, TouchEventArgs e)
+        {
+            if(targetTimer.IsEnabled && humanCaptured)
+            {
+                progressBar.Value = 0;
+                Canvas.SetLeft(target, random.Next(100, (int)playArea.ActualWidth - 100));
+                Canvas.SetTop(target, random.Next(100, (int)playArea.ActualHeight - 100));
+                Canvas.SetLeft(human, random.Next(100, (int)playArea.ActualWidth - 100));
+                Canvas.SetTop(human, random.Next(100, (int)playArea.ActualHeight - 100));
+                humanCaptured = false;
+                human.IsHitTestVisible = true;
+            }
+        }
+
+        private void PlayArea_TouchMove(object sender, TouchEventArgs e)
+        {
+            if (humanCaptured)
+            {
+                Point pointerPosition = e.GetTouchPoint(null).Position;
+                Point relativePosition = grid.TransformToVisual(playArea).Transform(pointerPosition);
+                if ((Math.Abs(relativePosition.X - Canvas.GetLeft(human)) > human.ActualWidth * 3)
+                    || (Math.Abs(relativePosition.Y - Canvas.GetTop(human)) > human.ActualHeight * 3))
+                {
+                    humanCaptured = false;
+                    human.IsHitTestVisible = true;
+                }
+                else
+                {
+                    Canvas.SetLeft(human, relativePosition.X - human.ActualWidth / 2);
+                    Canvas.SetTop(human, relativePosition.Y - human.ActualWidth / 2);
+                }
+            }
+        }
+
+        private void PlayArea_TouchLeave(object sender, TouchEventArgs e)
+        {
+            if(humanCaptured)
+            {
+                EndTheGame();
+            }
         }
     }
 }
