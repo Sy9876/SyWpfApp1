@@ -94,10 +94,10 @@ namespace WpfApp1
             AnimateEnemy(enemy, random.Next(randomFrom), random.Next(randomTo), "(Canvas.Top)");
             playArea.Children.Add(enemy);
 
-            enemy.TouchEnter += Enemy_TouchEnter;
+            enemy.MouseEnter += Enemy_MouseEnter;
         }
 
-        private void Enemy_TouchEnter(object sender, TouchEventArgs e)
+        private void Enemy_MouseEnter(object sender, MouseEventArgs e)
         {
             if(humanCaptured)
             {
@@ -126,7 +126,7 @@ namespace WpfApp1
 
         }
 
-        private void Human_TouchDown(object sender, TouchEventArgs e)
+        private void Human_MouseDown(object sender, MouseEventArgs e)
         {
             if(enemyTimer.IsEnabled)
             {
@@ -135,7 +135,7 @@ namespace WpfApp1
             }
         }
 
-        private void Target_TouchEnter(object sender, TouchEventArgs e)
+        private void Target_MouseEnter(object sender, MouseEventArgs e)
         {
             if(targetTimer.IsEnabled && humanCaptured)
             {
@@ -149,11 +149,11 @@ namespace WpfApp1
             }
         }
 
-        private void PlayArea_TouchMove(object sender, TouchEventArgs e)
+        private void PlayArea_MouseMove(object sender, MouseEventArgs e)
         {
             if (humanCaptured)
             {
-                Point pointerPosition = e.GetTouchPoint(null).Position;
+                Point pointerPosition = e.GetPosition(null);
                 Point relativePosition = grid.TransformToVisual(playArea).Transform(pointerPosition);
                 if ((Math.Abs(relativePosition.X - Canvas.GetLeft(human)) > human.ActualWidth * 3)
                     || (Math.Abs(relativePosition.Y - Canvas.GetTop(human)) > human.ActualHeight * 3))
@@ -169,12 +169,13 @@ namespace WpfApp1
             }
         }
 
-        private void PlayArea_TouchLeave(object sender, TouchEventArgs e)
+        private void PlayArea_MouseLeave(object sender, MouseEventArgs e)
         {
             if(humanCaptured)
             {
                 EndTheGame();
             }
         }
+
     }
 }
