@@ -63,13 +63,38 @@
             <Button x:Name="backButton" Content="goback" Grid.Column="0" IsEnabled="True" Height="40"></Button>
             <!--<TextBlock x:Name="pageTitle" Grid.Column="1" Text="{StaticResource AppName}"></TextBlock>-->
             <TextBlock x:Name="pageTitle" Grid.Column="1" Text="sy App" FontSize="20" VerticalAlignment="Center"></TextBlock>
+            <StackPanel Grid.Column="3" HorizontalAlignment="Right" Height="100" Margin="0" VerticalAlignment="Top" Width="100">
+                <Label x:Name="labelScore" Content="Label" FontSize="16"/>
+                <TextBlock x:Name="textBlockScore" TextWrapping="Wrap" Text="TextBlock" FontSize="20"/>
+            </StackPanel>
         </Grid>
     </Grid>
     <Page.Resources>
         <!--<TextBlock x:Key="AppName">Sy App</TextBlock>-->
         <ControlTemplate x:Key="EnemyTemplate" TargetType="{x:Type ContentControl}">
             <Grid Background="{x:Null}">
-                <Ellipse Fill="Red" HorizontalAlignment="Left" Height="80" VerticalAlignment="Top" Width="80"/>
+                <Ellipse Fill="Gray" Height="85" Width="75" Stroke="Black"/>
+                <Ellipse Fill="Black" Height="35" Stroke="Black" Width="25" RenderTransformOrigin="-0.104,0.031" Margin="6,22,44,43">
+                    <Ellipse.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform/>
+                            <SkewTransform AngleX="10"/>
+                            <RotateTransform/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </Ellipse.RenderTransform>
+                </Ellipse>
+                <Ellipse Fill="Black" Height="35" Stroke="Black" Width="25" RenderTransformOrigin="-0.104,0.031" Margin="44,22,6,43">
+                    <Ellipse.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform/>
+                            <SkewTransform AngleX="-10"/>
+                            <RotateTransform/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </Ellipse.RenderTransform>
+                </Ellipse>
+
             </Grid>
         </ControlTemplate>
     </Page.Resources>

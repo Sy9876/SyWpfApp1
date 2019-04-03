@@ -26,8 +26,9 @@ namespace WpfApp1
         DispatcherTimer enemyTimer = new DispatcherTimer();
         DispatcherTimer targetTimer = new DispatcherTimer();
         bool humanCaptured = false;
+        int score = 0;
 
-
+        
         public Page1()
         {
             InitializeComponent();
@@ -36,6 +37,9 @@ namespace WpfApp1
 
             targetTimer.Tick += TargetTimer_Tick;
             targetTimer.Interval = TimeSpan.FromSeconds(1);
+
+            textBlockScore.Text = "0";
+            score = 0;
         }
 
         private void TargetTimer_Tick(object sender, EventArgs e)
@@ -146,6 +150,9 @@ namespace WpfApp1
                 Canvas.SetTop(human, random.Next(100, (int)playArea.ActualHeight - 100));
                 humanCaptured = false;
                 human.IsHitTestVisible = true;
+
+                this.score += 10;
+                textBlockScore.Text = this.score.ToString();
             }
         }
 
